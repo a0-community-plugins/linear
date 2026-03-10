@@ -10,65 +10,45 @@
     <div x-data>
         <template x-if="$store.linearDashboardStore">
             <div class="lci-form">
-                <div class="field">
-                    <div class="field-label">
-                        <div class="field-title">Title *</div>
-                    </div>
-                    <div class="field-control">
-                        <input type="text" x-model="$store.linearDashboardStore.createForm.title"
-                               placeholder="Issue title" autofocus />
-                    </div>
-                </div>
+                <label class="lci-field">
+                    <span class="lci-label">Title *</span>
+                    <input type="text" x-model="$store.linearDashboardStore.createForm.title"
+                           placeholder="Issue title" autofocus />
+                </label>
 
-                <div class="field">
-                    <div class="field-label">
-                        <div class="field-title">Team *</div>
-                    </div>
-                    <div class="field-control">
-                        <select x-model="$store.linearDashboardStore.createForm.team_id">
-                            <option value="">Select team</option>
-                            <template x-for="team in $store.linearDashboardStore.teams" :key="team.id">
-                                <option :value="team.id" x-text="team.name"></option>
-                            </template>
-                        </select>
-                    </div>
-                </div>
+                <label class="lci-field">
+                    <span class="lci-label">Team *</span>
+                    <select x-model="$store.linearDashboardStore.createForm.team_id">
+                        <option value="">Select team</option>
+                        <template x-for="team in $store.linearDashboardStore.teams" :key="team.id">
+                            <option :value="team.id" x-text="team.name"></option>
+                        </template>
+                    </select>
+                </label>
 
                 <div class="lci-row">
-                    <div class="field lci-field-half">
-                        <div class="field-label">
-                            <div class="field-title">State</div>
-                        </div>
-                        <div class="field-control">
-                            <select x-model="$store.linearDashboardStore.createForm.state_id">
-                                <option value="">Default</option>
-                                <template x-for="state in $store.linearDashboardStore.states" :key="state.id">
-                                    <option :value="state.id" x-text="state.name"></option>
-                                </template>
-                            </select>
-                        </div>
-                    </div>
+                    <label class="lci-field">
+                        <span class="lci-label">State</span>
+                        <select x-model="$store.linearDashboardStore.createForm.state_id">
+                            <option value="">Default</option>
+                            <template x-for="state in $store.linearDashboardStore.states" :key="state.id">
+                                <option :value="state.id" x-text="state.name"></option>
+                            </template>
+                        </select>
+                    </label>
 
-                    <div class="field lci-field-half">
-                        <div class="field-label">
-                            <div class="field-title">Assignee</div>
-                        </div>
-                        <div class="field-control">
-                            <select x-model="$store.linearDashboardStore.createForm.assignee_id">
-                                <option value="">Unassigned</option>
-                                <template x-for="member in $store.linearDashboardStore.members" :key="member.id">
-                                    <option :value="member.id" x-text="member.displayName || member.name"></option>
-                                </template>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+                    <label class="lci-field">
+                        <span class="lci-label">Assignee</span>
+                        <select x-model="$store.linearDashboardStore.createForm.assignee_id">
+                            <option value="">Unassigned</option>
+                            <template x-for="member in $store.linearDashboardStore.members" :key="member.id">
+                                <option :value="member.id" x-text="member.displayName || member.name"></option>
+                            </template>
+                        </select>
+                    </label>
 
-                <div class="field">
-                    <div class="field-label">
-                        <div class="field-title">Priority</div>
-                    </div>
-                    <div class="field-control">
+                    <label class="lci-field">
+                        <span class="lci-label">Priority</span>
                         <select x-model="$store.linearDashboardStore.createForm.priority">
                             <option value="">None</option>
                             <option value="1">Urgent</option>
@@ -76,19 +56,15 @@
                             <option value="3">Medium</option>
                             <option value="4">Low</option>
                         </select>
-                    </div>
+                    </label>
                 </div>
 
-                <div class="field">
-                    <div class="field-label">
-                        <div class="field-title">Description</div>
-                    </div>
-                    <div class="field-control">
-                        <textarea rows="6"
-                                  x-model="$store.linearDashboardStore.createForm.description"
-                                  placeholder="Markdown description (optional)"></textarea>
-                    </div>
-                </div>
+                <label class="lci-field">
+                    <span class="lci-label">Description</span>
+                    <textarea rows="5"
+                              x-model="$store.linearDashboardStore.createForm.description"
+                              placeholder="Markdown description (optional)"></textarea>
+                </label>
             </div>
         </template>
     </div>
@@ -104,19 +80,33 @@
         .lci-form {
             display: flex;
             flex-direction: column;
-            gap: var(--spacing-sm, 0.5rem);
+            gap: 0.75rem;
+        }
+        .lci-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .lci-label {
+            font-size: var(--font-size-small, 0.85rem);
+            font-weight: 600;
+            color: var(--color-text-secondary, #aaa);
         }
         .lci-row {
             display: flex;
-            gap: var(--spacing-md, 1rem);
+            gap: 0.75rem;
         }
-        .lci-field-half {
+        .lci-row .lci-field {
             flex: 1;
+            min-width: 0;
         }
-        textarea {
+        .lci-form textarea {
             width: 100%;
             resize: vertical;
             font-family: inherit;
+        }
+        .lci-form select {
+            width: 100%;
         }
     </style>
 </body>

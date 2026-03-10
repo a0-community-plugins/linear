@@ -2,7 +2,7 @@
 <div x-data>
     <template x-if="!$store.linearDashboardStore || $store.linearDashboardStore?.config?.show_sidebar_button !== false">
         <button x-move-after=".config-button#dashboard" class="config-button" id="linear-dash"
-            @click="openModal('../plugins/linear/webui/linear-dashboard.html')"
+            @click="openModal('../plugins/linear/webui/main.html')"
             title="Linear">
             <span class="material-symbols-outlined">task_alt</span>
         </button>

@@ -4,7 +4,8 @@
 </head>
 
 <body>
-    <div x-data>
+    <div x-data="{ _ctx: null, get config() { return this._ctx?.settings; }, get context() { return this._ctx; } }"
+         x-create="(() => { const m = $el.closest('.modal'); _ctx = m?.__pluginSettingsContext; })()">
         <template x-if="config">
             <div>
                 <div class="section-title">Linear Integration</div>
@@ -56,10 +57,10 @@
                         </div>
                     </div>
                     <div class="field-control">
-                        <input
-                            type="checkbox"
-                            x-model="config.show_sidebar_button"
-                        />
+                        <label class="toggle">
+                            <input type="checkbox" x-model="config.show_sidebar_button" />
+                            <span class="toggler"></span>
+                        </label>
                     </div>
                 </div>
 
@@ -71,10 +72,10 @@
                         </div>
                     </div>
                     <div class="field-control">
-                        <input
-                            type="checkbox"
-                            x-model="config.auto_refresh_on_focus"
-                        />
+                        <label class="toggle">
+                            <input type="checkbox" x-model="config.auto_refresh_on_focus" />
+                            <span class="toggler"></span>
+                        </label>
                     </div>
                 </div>
             </div>
