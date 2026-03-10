@@ -1,0 +1,123 @@
+<html>
+<head>
+    <title>Create Issue</title>
+    <script type="module">
+        import { store } from "/plugins/linear/webui/linear-dashboard-store.js";
+    </script>
+</head>
+
+<body>
+    <div x-data>
+        <template x-if="$store.linearDashboardStore">
+            <div class="lci-form">
+                <div class="field">
+                    <div class="field-label">
+                        <div class="field-title">Title *</div>
+                    </div>
+                    <div class="field-control">
+                        <input type="text" x-model="$store.linearDashboardStore.createForm.title"
+                               placeholder="Issue title" autofocus />
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="field-label">
+                        <div class="field-title">Team *</div>
+                    </div>
+                    <div class="field-control">
+                        <select x-model="$store.linearDashboardStore.createForm.team_id">
+                            <option value="">Select team</option>
+                            <template x-for="team in $store.linearDashboardStore.teams" :key="team.id">
+                                <option :value="team.id" x-text="team.name"></option>
+                            </template>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="lci-row">
+                    <div class="field lci-field-half">
+                        <div class="field-label">
+                            <div class="field-title">State</div>
+                        </div>
+                        <div class="field-control">
+                            <select x-model="$store.linearDashboardStore.createForm.state_id">
+                                <option value="">Default</option>
+                                <template x-for="state in $store.linearDashboardStore.states" :key="state.id">
+                                    <option :value="state.id" x-text="state.name"></option>
+                                </template>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="field lci-field-half">
+                        <div class="field-label">
+                            <div class="field-title">Assignee</div>
+                        </div>
+                        <div class="field-control">
+                            <select x-model="$store.linearDashboardStore.createForm.assignee_id">
+                                <option value="">Unassigned</option>
+                                <template x-for="member in $store.linearDashboardStore.members" :key="member.id">
+                                    <option :value="member.id" x-text="member.displayName || member.name"></option>
+                                </template>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="field-label">
+                        <div class="field-title">Priority</div>
+                    </div>
+                    <div class="field-control">
+                        <select x-model="$store.linearDashboardStore.createForm.priority">
+                            <option value="">None</option>
+                            <option value="1">Urgent</option>
+                            <option value="2">High</option>
+                            <option value="3">Medium</option>
+                            <option value="4">Low</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="field-label">
+                        <div class="field-title">Description</div>
+                    </div>
+                    <div class="field-control">
+                        <textarea rows="6"
+                                  x-model="$store.linearDashboardStore.createForm.description"
+                                  placeholder="Markdown description (optional)"></textarea>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <div class="modal-footer" data-modal-footer>
+        <button class="btn btn-ok"
+                @click="$store.linearDashboardStore.submitCreateIssue()">Create</button>
+        <button class="btn btn-cancel"
+                @click="closeModal('../plugins/linear/webui/linear-create-issue.html')">Cancel</button>
+    </div>
+
+    <style>
+        .lci-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm, 0.5rem);
+        }
+        .lci-row {
+            display: flex;
+            gap: var(--spacing-md, 1rem);
+        }
+        .lci-field-half {
+            flex: 1;
+        }
+        textarea {
+            width: 100%;
+            resize: vertical;
+            font-family: inherit;
+        }
+    </style>
+</body>
+</html>

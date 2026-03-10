@@ -1,0 +1,12 @@
+<!-- Linear Dashboard -->
+<div x-data>
+    <button
+        x-move-after=".quick-actions-dropdown .dropdown-header + .dropdown-item"
+        class="dropdown-item"
+        id="linear-dash-dropdown"
+        title="Linear"
+        @click="openModal('../plugins/linear/webui/linear-dashboard.html'); dropdownOpen = false">
+        <span class="material-symbols-outlined">task_alt</span>
+        <span>Linear</span>
+    </button>
+</div>

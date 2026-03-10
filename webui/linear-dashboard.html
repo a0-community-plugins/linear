@@ -1,0 +1,374 @@
+<html>
+<head>
+    <title>Linear Issues</title>
+    <script type="module">
+        import { store } from "/plugins/linear/webui/linear-dashboard-store.js";
+    </script>
+</head>
+
+<body>
+    <div x-data>
+        <template x-if="$store.linearDashboardStore">
+            <div class="linear-dashboard"
+                 x-create="$store.linearDashboardStore.onOpen()"
+                 x-destroy="$store.linearDashboardStore.cleanup()">
+
+                <!-- Toolbar -->
+                <div class="ld-toolbar">
+                    <div class="ld-filters">
+                        <select x-model="$store.linearDashboardStore.selectedTeam"
+                                @change="$store.linearDashboardStore.onTeamChange()">
+                            <option value="">All Teams</option>
+                            <template x-for="team in $store.linearDashboardStore.teams" :key="team.id">
+                                <option :value="team.id" x-text="team.name"></option>
+                            </template>
+                        </select>
+
+                        <select x-model="$store.linearDashboardStore.stateFilter"
+                                @change="$store.linearDashboardStore.onFilterChange()">
+                            <option value="">All States</option>
+                            <template x-for="state in $store.linearDashboardStore.states" :key="state.id">
+                                <option :value="state.name" x-text="state.name"></option>
+                            </template>
+                        </select>
+
+                        <select x-model="$store.linearDashboardStore.assigneeFilter"
+                                @change="$store.linearDashboardStore.onFilterChange()">
+                            <option value="">All Assignees</option>
+                            <template x-for="member in $store.linearDashboardStore.members" :key="member.id">
+                                <option :value="member.name" x-text="member.displayName || member.name"></option>
+                            </template>
+                        </select>
+                    </div>
+
+                    <div class="ld-actions">
+                        <input type="text" class="ld-search"
+                               placeholder="Search issues..."
+                               x-model="$store.linearDashboardStore.searchQuery"
+                               @input="$store.linearDashboardStore.onSearchInput()" />
+
+                        <button class="btn btn-cancel" @click="$store.linearDashboardStore.refresh()" title="Refresh">
+                            <span class="material-symbols-outlined">refresh</span>
+                        </button>
+
+                        <button class="btn btn-ok" @click="$store.linearDashboardStore.openCreateModal()">
+                            + New Issue
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Error -->
+                <template x-if="$store.linearDashboardStore.error">
+                    <div class="ld-error" x-text="$store.linearDashboardStore.error"></div>
+                </template>
+
+                <!-- Loading -->
+                <template x-if="$store.linearDashboardStore.loading">
+                    <div class="ld-loading">
+                        <div class="loading" style="height: 2em; margin: 0.5em 0;"></div>
+                        <div class="loading" style="height: 2em; margin: 0.5em 0;"></div>
+                        <div class="loading" style="height: 2em; margin: 0.5em 0;"></div>
+                    </div>
+                </template>
+
+                <!-- Issue Table -->
+                <template x-if="!$store.linearDashboardStore.loading">
+                    <div class="ld-table-wrap">
+                        <template x-if="$store.linearDashboardStore.issues.length === 0">
+                            <div class="ld-empty">No issues found.</div>
+                        </template>
+
+                        <template x-if="$store.linearDashboardStore.issues.length > 0">
+                            <div>
+                                <div class="ld-table">
+                                    <div class="ld-header">
+                                        <div class="ld-cell col-id">ID</div>
+                                        <div class="ld-cell col-title">Title</div>
+                                        <div class="ld-cell col-state">State</div>
+                                        <div class="ld-cell col-assignee">Assignee</div>
+                                        <div class="ld-cell col-priority">Pri</div>
+                                    </div>
+                                    <div class="ld-body">
+                                        <template x-for="issue in $store.linearDashboardStore.issues" :key="issue.id">
+                                            <div>
+                                                    <!-- Compact row -->
+                                                    <div class="ld-row"
+                                                         :class="{ 'ld-row-expanded': $store.linearDashboardStore.expandedRow === issue.id }"
+                                                         @click="$store.linearDashboardStore.toggleRow(issue.id)">
+                                                        <div class="ld-cell col-id" x-text="issue.identifier"></div>
+                                                        <div class="ld-cell col-title" x-text="issue.title"></div>
+                                                        <div class="ld-cell col-state">
+                                                            <span class="ld-state-dot"
+                                                                  :style="'background:' + $store.linearDashboardStore.stateColor(issue.state?.type)"></span>
+                                                            <span x-text="issue.state?.name || '—'"></span>
+                                                        </div>
+                                                        <div class="ld-cell col-assignee" x-text="issue.assignee?.name || '—'"></div>
+                                                        <div class="ld-cell col-priority" x-text="$store.linearDashboardStore.priorityIcon(issue.priority)"></div>
+                                                    </div>
+
+                                                    <!-- Expanded detail -->
+                                                    <template x-if="$store.linearDashboardStore.expandedRow === issue.id">
+                                                        <div class="ld-expanded">
+                                                            <div class="ld-expanded-info">
+                                                                <div class="ld-desc" x-text="$store.linearDashboardStore.truncate(issue.description)"></div>
+                                                                <div class="ld-meta">
+                                                                    <template x-if="issue.labels?.nodes?.length">
+                                                                        <span>
+                                                                            Labels:
+                                                                            <template x-for="label in issue.labels.nodes" :key="label.id">
+                                                                                <span class="ld-label" x-text="label.name"></span>
+                                                                            </template>
+                                                                        </span>
+                                                                    </template>
+                                                                    <span x-text="'Updated ' + $store.linearDashboardStore.timeAgo(issue.updatedAt)"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="ld-expanded-actions" @click.stop>
+                                                                <select @change="$store.linearDashboardStore.updateIssueStatus(issue.id, $event.target.value); $event.target.value = ''">
+                                                                    <option value="">Status...</option>
+                                                                    <template x-for="state in $store.linearDashboardStore.states" :key="state.id">
+                                                                        <option :value="state.id" x-text="state.name"></option>
+                                                                    </template>
+                                                                </select>
+                                                                <select @change="$store.linearDashboardStore.assignIssue(issue.id, $event.target.value); $event.target.value = ''">
+                                                                    <option value="">Assign...</option>
+                                                                    <template x-for="member in $store.linearDashboardStore.members" :key="member.id">
+                                                                        <option :value="member.id" x-text="member.displayName || member.name"></option>
+                                                                    </template>
+                                                                </select>
+                                                                <div class="ld-comment-inline">
+                                                                    <input type="text" placeholder="Add comment..."
+                                                                           x-model="$store.linearDashboardStore.commentText"
+                                                                           @keydown.enter="$store.linearDashboardStore.addComment(issue.id)" />
+                                                                    <button class="btn btn-ok btn-sm"
+                                                                            @click="$store.linearDashboardStore.addComment(issue.id)">
+                                                                        <span class="material-symbols-outlined">send</span>
+                                                                    </button>
+                                                                </div>
+                                                                <button class="btn btn-cancel btn-sm"
+                                                                        @click="$store.linearDashboardStore.loadIssueDetail(issue.id)"
+                                                                        title="View details">
+                                                                    <span class="material-symbols-outlined">open_in_new</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <!-- Issue count -->
+                                <div class="ld-pagination">
+                                    <span class="ld-total" x-text="$store.linearDashboardStore.totalCount + ' issues'"></span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+        </template>
+    </div>
+
+    <style>
+        .linear-dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm, 0.5rem);
+        }
+
+        /* Toolbar */
+        .ld-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm, 0.5rem);
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: var(--spacing-sm, 0.5rem);
+            border-bottom: 1px solid var(--color-border);
+        }
+        .ld-filters {
+            display: flex;
+            gap: var(--spacing-sm, 0.5rem);
+            flex-wrap: wrap;
+        }
+        .ld-filters select {
+            width: auto;
+            min-width: 120px;
+            max-width: 180px;
+        }
+        .ld-actions {
+            display: flex;
+            gap: var(--spacing-sm, 0.5rem);
+            align-items: center;
+        }
+        .ld-search {
+            min-width: 180px;
+        }
+
+        /* Error */
+        .ld-error {
+            color: var(--color-error, #ef4444);
+            padding: var(--spacing-sm, 0.5rem);
+            border: 1px solid var(--color-error, #ef4444);
+            border-radius: var(--border-radius, 4px);
+        }
+
+        /* Empty */
+        .ld-empty {
+            text-align: center;
+            padding: 2rem;
+            color: var(--color-text-secondary, #888);
+        }
+
+        /* Table (flex-based) */
+        .ld-table {
+            width: 100%;
+        }
+        .ld-header {
+            display: flex;
+            padding: 0.5rem 0.75rem;
+            border-bottom: 2px solid var(--color-border);
+            font-size: var(--font-size-small, 0.85rem);
+            color: var(--color-text-secondary, #888);
+            position: sticky;
+            top: 0;
+            background: var(--color-panel, #1a1a2e);
+            z-index: 10;
+        }
+
+        /* Row */
+        .ld-row {
+            display: flex;
+            cursor: pointer;
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--color-border);
+            transition: background var(--transition-speed, 0.2s);
+            align-items: center;
+        }
+        .ld-row:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .ld-row-expanded {
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: none;
+        }
+        .ld-cell {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding-right: 0.5rem;
+        }
+        .ld-cell.col-title {
+            flex: 1;
+        }
+        .ld-cell.col-id { width: 90px; flex-shrink: 0; }
+        .ld-cell.col-state { width: 120px; flex-shrink: 0; }
+        .ld-cell.col-assignee { width: 100px; flex-shrink: 0; }
+        .ld-cell.col-priority { width: 50px; flex-shrink: 0; text-align: center; }
+
+        /* State dot */
+        .ld-state-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
+        /* Expanded area */
+        .ld-expanded {
+            padding: 0.75rem 0.75rem 0.75rem 90px;
+            border-bottom: 1px solid var(--color-border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .ld-expanded-info {
+            margin-bottom: 0.5rem;
+        }
+        .ld-desc {
+            font-size: var(--font-size-small, 0.85rem);
+            color: var(--color-text-secondary, #888);
+            margin-bottom: 0.25rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .ld-meta {
+            font-size: 0.75rem;
+            color: var(--color-text-secondary, #888);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .ld-label {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.1rem 0.4rem;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            margin-right: 0.25rem;
+        }
+        .ld-expanded-actions {
+            display: flex;
+            gap: var(--spacing-sm, 0.5rem);
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+        .ld-expanded-actions select {
+            width: auto;
+            min-width: 100px;
+            max-width: 150px;
+            font-size: var(--font-size-small, 0.85rem);
+        }
+        .ld-comment-inline {
+            display: flex;
+            gap: 0.25rem;
+            flex: 1;
+            min-width: 150px;
+        }
+        .ld-comment-inline input {
+            flex: 1;
+            font-size: var(--font-size-small, 0.85rem);
+        }
+
+        /* Pagination */
+        .ld-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm, 0.5rem);
+            padding: var(--spacing-sm, 0.5rem) 0;
+            font-size: var(--font-size-small, 0.85rem);
+        }
+        .ld-total {
+            margin-left: auto;
+            color: var(--color-text-secondary, #888);
+        }
+
+        /* Button size variant */
+        .btn-sm {
+            padding: 0.2rem 0.4rem;
+            font-size: 0.8rem;
+        }
+        .btn-sm .material-symbols-outlined {
+            font-size: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 700px) {
+            .ld-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .ld-expanded {
+                padding-left: 0.75rem;
+            }
+            .col-assignee, .col-priority {
+                display: none;
+            }
+        }
+    </style>
+</body>
+</html>

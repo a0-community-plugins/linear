@@ -1,0 +1,84 @@
+<html>
+<head>
+    <title>Linear</title>
+</head>
+
+<body>
+    <div x-data>
+        <template x-if="$store.pluginSettings.settings">
+            <div>
+                <div class="section-title">Linear Integration</div>
+                <div class="section-description">
+                    Connect Agent Zero to your Linear workspace. Create an API key at
+                    <a href="https://linear.app/settings/account/security" target="_blank" rel="noopener noreferrer">
+                        Linear Settings &gt; Security &amp; Access
+                    </a>.
+                </div>
+
+                <div class="field">
+                    <div class="field-label">
+                        <div class="field-title">API Key</div>
+                        <div class="field-description">
+                            Your personal Linear API key. Used to authenticate all requests.
+                        </div>
+                    </div>
+                    <div class="field-control">
+                        <input
+                            type="password"
+                            x-model="$store.pluginSettings.settings.api_key"
+                            placeholder="lin_api_..."
+                        />
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="field-label">
+                        <div class="field-title">Default Team</div>
+                        <div class="field-description">
+                            Optional team ID or key used when no team is specified in tool calls.
+                            Use the linear:list_teams tool to find your team IDs.
+                        </div>
+                    </div>
+                    <div class="field-control">
+                        <input
+                            type="text"
+                            x-model="$store.pluginSettings.settings.default_team"
+                            placeholder="e.g. team UUID or key"
+                        />
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="field-label">
+                        <div class="field-title">Show Sidebar Button</div>
+                        <div class="field-description">
+                            Show a quick-access button for the Linear dashboard in the sidebar.
+                        </div>
+                    </div>
+                    <div class="field-control">
+                        <input
+                            type="checkbox"
+                            x-model="$store.pluginSettings.settings.show_sidebar_button"
+                        />
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="field-label">
+                        <div class="field-title">Auto-Refresh on Focus</div>
+                        <div class="field-description">
+                            Automatically refresh the issue list when the browser tab regains focus.
+                        </div>
+                    </div>
+                    <div class="field-control">
+                        <input
+                            type="checkbox"
+                            x-model="$store.pluginSettings.settings.auto_refresh_on_focus"
+                        />
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</body>
+</html>
