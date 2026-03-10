@@ -5,7 +5,7 @@
 
 <body>
     <div x-data>
-        <template x-if="$store.pluginSettings.settings">
+        <template x-if="config">
             <div>
                 <div class="section-title">Linear Integration</div>
                 <div class="section-description">
@@ -25,7 +25,7 @@
                     <div class="field-control">
                         <input
                             type="password"
-                            x-model="$store.pluginSettings.settings.api_key"
+                            x-model="config.api_key"
                             placeholder="lin_api_..."
                         />
                     </div>
@@ -42,7 +42,7 @@
                     <div class="field-control">
                         <input
                             type="text"
-                            x-model="$store.pluginSettings.settings.default_team"
+                            x-model="config.default_team"
                             placeholder="e.g. team UUID or key"
                         />
                     </div>
@@ -58,7 +58,7 @@
                     <div class="field-control">
                         <input
                             type="checkbox"
-                            x-model="$store.pluginSettings.settings.show_sidebar_button"
+                            x-model="config.show_sidebar_button"
                         />
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                     <div class="field-control">
                         <input
                             type="checkbox"
-                            x-model="$store.pluginSettings.settings.auto_refresh_on_focus"
+                            x-model="config.auto_refresh_on_focus"
                         />
                     </div>
                 </div>
